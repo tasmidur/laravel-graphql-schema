@@ -1,0 +1,18 @@
+<?php
+namespace $NAMESPACE$;
+use App\Models\$MODEL$;
+use Rebing\GraphQL\Support\Type as GraphQLType;
+use GraphQL\Type\Definition\Type;
+class $MODEL$Type extends GraphQLType
+{
+    protected $attributes = [
+        "name"          => "$MODEL$",
+        "description"   => "The $MODEL$ Type",
+        "model"         => $MODEL$::class,
+    ];
+    public function fields(): array
+    {
+        return $FIELDS$;
+    }
+
+}
