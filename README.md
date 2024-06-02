@@ -113,7 +113,9 @@ GraphQL Type Fields:
     ]
 ]
 ```
+
 GraphQL Validation Rules:
+```
 [
     'id' => ['required', 'integer'],
     'name' => ['required', 'string', 'min:1'],
@@ -128,7 +130,9 @@ GraphQL Validation Rules:
     'net_income' => ['required', 'integer'],
     'send_newsletter' => ['nullable', 'boolean']
 ]
+```
 GraphQL Query Arguments:
+```
 [
     [
         "name"=> "id",
