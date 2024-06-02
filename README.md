@@ -6,44 +6,39 @@
 [![License](https://img.shields.io/packagist/l/laracraft-tech/laravel-schema-rules.svg?style=flat-square)](https://packagist.org/packages/laracraft-tech/laravel-schema-rules)
 [![Total Downloads](https://img.shields.io/packagist/dt/laracraft-tech/laravel-schema-rules.svg?style=flat-square)](https://packagist.org/packages/laracraft-tech/laravel-schema-rules)
 
-Automatically generate basic Laravel validation rules based on your database table schema!
+Automatically generate basic Laravel graphql schema types based on your database table schema!
 Use these as a starting point to fine-tune and optimize your validation rules as needed. 
-
-Here you can use the web version, if you like: [https://validationforlaravel.com](https://validationforlaravel.com)
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require laracraft-tech/laravel-schema-rules --dev
+composer require tasmidur/laravel-graphql-schema --dev
 ```
 
 Then publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="schema-rules-config"
+php artisan vendor:publish --tag="graphql-schema-config"
 ```
 
 ## ToC
 
-- [`Generate rules for a whole table`](#generate-rules-for-a-whole-table)
-- [`Generate rules for specific columns`](#generate-rules-for-specific-columns)
-- [`Generate Form Request Class`](#generate-form-request-class)
+- [`Generate graphql schema type,query,mutation for a whole table`](#generate-type-query-mutation-for-a-whole-table)
+- [`Generate graphql schema type,query,mutation Class`](#generate-type-query-mutation-for-a-whole-class)
 
 ## Usage
 
 Let's say you've migrated this fictional table:
 
 ````php
-Schema::create('persons', function (Blueprint $table) {
+Schema::create('users', function (Blueprint $table) {
     $table->id();
-    $table->string('first_name', 100);
-    $table->string('last_name', 100);
+    $table->string('name', 100);
     $table->string('email');
-    $table->foreignId('address_id')->constrained();
     $table->text('bio')->nullable();
-    $table->enum('gender', ['m', 'f', 'd']);
+    $table->enum('gender', ['male', 'female', 'others']);
     $table->date('birth');
     $table->year('graduated');
     $table->float('body_size');
@@ -51,34 +46,140 @@ Schema::create('persons', function (Blueprint $table) {
     $table->integer('account_balance');
     $table->unsignedInteger('net_income');
     $table->boolean('send_newsletter')->nullable();
+    $table->timestamps();
 });
 ````
 
-### Generate rules for a whole table
+### Generate schema for a whole table
 
 Now if you run:
 
-`php artisan schema:generate-rules persons`
+`php artisan schema:generate-rules users`
 
 You'll get:
+
+GraphQL Schema type for table "schema_test" has been generated!
+Copy & paste these wherever your GraphQL type is defined:
+GraphQL Type Fields:
 ```
-Schema-based validation rules for table "persons" have been generated!
-Copy & paste these to your controller validation or form request or where ever your validation takes place:
 [
-    'first_name' => ['required', 'string', 'min:1', 'max:100'],
-    'last_name' => ['required', 'string', 'min:1', 'max:100'],
-    'email' => ['required', 'string', 'min:1', 'max:255'],
-    'address_id' => ['required', 'exists:addresses,id'],
+    "id"=> [
+        "type"=> Type::nonNull(Type::int()),
+        "description"=> "The id of the schema_test"
+    ],
+    "name"=> [
+        "type"=> Type::nonNull(Type::string()),
+        "description"=> "The name of the schema_test"
+    ],
+    "email"=> [
+        "type"=> Type::nonNull(Type::string()),
+        "description"=> "The email of the schema_test"
+    ],
+    "bio"=> [
+        "type"=> Type::string(),
+        "description"=> "The bio of the schema_test"
+    ],
+    "gender"=> [
+        "type"=> Type::nonNull(Type::string()),
+        "description"=> "The gender of the schema_test"
+    ],
+    "birth"=> [
+        "type"=> Type::nonNull(Type::string()),
+        "description"=> "The birth of the schema_test"
+    ],
+    "graduated"=> [
+        "type"=> Type::nonNull(Type::int()),
+        "description"=> "The graduated of the schema_test"
+    ],
+    "body_size"=> [
+        "type"=> Type::nonNull(Type::float()),
+        "description"=> "The body_size of the schema_test"
+    ],
+    "children_count"=> [
+        "type"=> Type::int(),
+        "description"=> "The children_count of the schema_test"
+    ],
+    "account_balance"=> [
+        "type"=> Type::nonNull(Type::int()),
+        "description"=> "The account_balance of the schema_test"
+    ],
+    "net_income"=> [
+        "type"=> Type::nonNull(Type::int()),
+        "description"=> "The net_income of the schema_test"
+    ],
+    "send_newsletter"=> [
+        "type"=> Type::boolean(),
+        "description"=> "The send_newsletter of the schema_test"
+    ]
+]
+```
+GraphQL Validation Rules:
+[
+    'id' => ['required', 'integer'],
+    'name' => ['required', 'string', 'min:1'],
+    'email' => ['required', 'string', 'min:1'],
     'bio' => ['nullable', 'string', 'min:1'],
-    'gender' => ['required', 'string', 'in:m,f,d'],
+    'gender' => ['required', 'string', 'min:1'],
     'birth' => ['required', 'date'],
-    'graduated' => ['required', 'integer', 'min:1901', 'max:2155'],
+    'graduated' => ['required', 'integer'],
     'body_size' => ['required', 'numeric'],
-    'children_count' => ['nullable', 'integer', 'min:0', 'max:255'],
-    'account_balance' => ['required', 'integer', 'min:-2147483648', 'max:2147483647'],
-    'net_income' => ['required', 'integer', 'min:0', 'max:4294967295'],
+    'children_count' => ['nullable', 'integer'],
+    'account_balance' => ['required', 'integer'],
+    'net_income' => ['required', 'integer'],
     'send_newsletter' => ['nullable', 'boolean']
 ]
+GraphQL Query Arguments:
+[
+    [
+        "name"=> "id",
+        "type"=> Type::int()
+    ],
+    [
+        "name"=> "name",
+        "type"=> Type::string()
+    ],
+    [
+        "name"=> "email",
+        "type"=> Type::string()
+    ],
+    [
+        "name"=> "bio",
+        "type"=> Type::string()
+    ],
+    [
+        "name"=> "gender",
+        "type"=> Type::string()
+    ],
+    [
+        "name"=> "birth",
+        "type"=> Type::string()
+    ],
+    [
+        "name"=> "graduated",
+        "type"=> Type::int()
+    ],
+    [
+        "name"=> "body_size",
+        "type"=> Type::float()
+    ],
+    [
+        "name"=> "children_count",
+        "type"=> Type::int()
+    ],
+    [
+        "name"=> "account_balance",
+        "type"=> Type::int()
+    ],
+    [
+        "name"=> "net_income",
+        "type"=> Type::int()
+    ],
+    [
+        "name"=> "send_newsletter",
+        "type"=> Type::boolean()
+    ]
+]
+
 ```
 
 As you may have noticed the float-column `body_size`, just gets generated to `['required', 'numeric']`.
